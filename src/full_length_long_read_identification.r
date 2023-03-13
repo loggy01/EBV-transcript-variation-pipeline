@@ -1,7 +1,7 @@
 #!/usr/bin/Rscript --vanilla
 
-#################################################################################################################################################################################################################################################
-# PART ONE OF TWO OF THE IR1 TRANSCRIPT ELUCIDATION PIPELINE (Aaron Logsdon, 2023. Written in R version 4.2.2 using Bioconductor version 3.16 within Visual Studio Code version 1.76 on macOS Ventura version 13.0)
+###############################################################################################################################################################################################################################################################################################
+# PART ONE OF TWO OF THE IR1 TRANSCRIPT ELUCIDATION PIPELINE (Aaron Logsdon, 2023. Written in R version 4.2.2 (using Bioconductor version 3.16) within Visual Studio Code version 1.76 on macOS Ventura version 13.0)
 # NAME: full_length_long_read_identification.r
 # PURPOSE: separate n number of sam files containing long read data into four read sets for each sam file:
     # 1) full length reads
@@ -13,9 +13,9 @@
     # 2) The R packages "data.table", "stringi", and "tidyverse" must be installed using the R console (see https://www.bioconductor.org/install/)
 # FUNCTIONS: 
     # 1) Extracts read start and end positions from n number of input sam files
-    # 2) Assigns significant windows of read starts/ends using a user-defined window size (± from reference position) and user-defined minimum window read count. We used a window size of 2 and minimum window read count of 5
-    # 3) Assigns unassigned and potentially significant read starts/ends missed by the previous step to significant windows based on a user defined window size (± from center of significant window in question). We used a window size of 10
-    # 4) Assigns read starts/ends missed by the previous steps due to soft clipping to significant windows, again using a user defined window size (± from center of significant window in question). We used a window size of 10
+    # 2) Assigns significant windows of read starts/ends using a user-defined window size (± from reference position) and user-defined minimum window read count. We used a window size of 2 and minimum window read count of 5 for dRNA-seq Oxford Nanopore Technologies data
+    # 3) Assigns unassigned and potentially significant read starts/ends missed by the previous step to significant windows based on a user defined window size (± from center of significant window in question). We used a window size of 20 for dRNA-seq Oxford Nanopore Technologies data
+    # 4) Assigns read starts/ends missed by the previous steps due to soft clipping to significant windows, again using a user defined window size (± from center of significant window in question). We used a window size of 20 for dRNA-seq Oxford Nanopore Technologies data
     # 5) Updates each input sam file for soft clipping correction from the previous step
     # 6) Assigns reads to the mentioned read sets based on whether they appear in significant start and end windows, only significant start windows, only significant end windows, or neither respectively
     # 7) Outputs the four read sets from each sam file into the current working directory (file name format: e.g. HB9_full_length_reads.sam)
@@ -25,9 +25,9 @@
     # 3) Cigar strings must be in the original format aka using M instead of = and X (most alignment tools allow the choice of format)
     # 4) Each input sam file must be edited prior to remove the qual column (the script adds this back) and header (the user must add this back after) using samtools on the command line (samtools view input_sam | cut -f 1-10 > output_sam)
 # COMMAND LINE FORMAT: Rscript full_length_long_read_identification.r sam_one.sam,sam_two.sam,...,sam_n.sam sam_name_one,sam_name_two,...,sam_name_n significance_window mininum_significant_read_count noise_window clip_window
-# COMMAND LINE EXAMPLE: Rscript ./full_length_long_read_identification.r ./HB9.sam HB9 2 5 10 10
-# FOLLOW UP: Output full length read sam files should be passed to the next script in the pipeline (IR1_transcript_correction_and_elucidation.r)
-#################################################################################################################################################################################################################################################
+# COMMAND LINE EXAMPLE: Rscript ./full_length_long_read_identification.r ./HB9.sam HB9 2 5 20 20
+# FOLLOW UP: Output full length read sam files should be passed to the next script in the pipeline (IR1_read_correction_and_elucidation.r)
+###############################################################################################################################################################################################################################################################################################
 
 ### Load packages ###
 library(data.table)
@@ -114,7 +114,7 @@ for(i in 1:length(combined_position_data)){
                     last_query_index <- k # keep track of last query index to avoid redundant comparisons
                 }
             }
-            if(significant_read_count >= mininum_significant_read_count){ # check if read count is greater than or equal to user_defined mininum ciunt before adding to comparison_data
+            if(significant_read_count >= mininum_significant_read_count){ # check if read count is greater than or equal to user_defined mininum count before adding to comparison_data
                 comparison_data <- rbind(comparison_data, c(reference_position, significant_read_count, significant_read_qnames))
                 significant_read_qnames <- unlist(strsplit(significant_read_qnames, split = ","))
                 unassigned_qnames[[i]] <- unassigned_qnames[[i]][!(unassigned_qnames[[i]] %in% significant_read_qnames)] # remove the newly assigned significant qnames from the unassigned_qnames for the current strand (plus/minus) and read type (start/end)
@@ -150,7 +150,7 @@ for(i in 1:length(combined_position_data)){
     combined_position_comparison_data[[i]] <- combined_position_comparison_data[[i]][order(as.numeric(combined_position_comparison_data[[i]]$genomic_position)), ]
 }
 
-### Capture significant clipped reads with clips falling around significant windows, using a user-defined window size, and write read counts from TASK FOUR, TASK FIVE, and TASK SIX. Also update the input sam files for the clip corrections ###
+### Capture significant clipped reads with clips falling around significant windows, using a user-defined window size. Also update the input sam files for the clip corrections ###
 combined_sam_files <- vector(mode = "list", length = length(sam_files))
 for(i in 1:length(sam_files)){
     combined_sam_files[[i]] <- read.table(sam_files[i], sep = "\t", header = FALSE) # store the input sam files in a list
@@ -191,11 +191,11 @@ for(i in 1:length(combined_position_data)){
                                         combined_position_comparison_data[[i]]$clipped_read_count[m] <- as.numeric(combined_position_comparison_data[[i]]$clipped_read_count[m]) + 1
                                         combined_position_comparison_data[[i]]$clipped_read_qnames[m] <- paste(combined_position_comparison_data[[i]]$clipped_read_qnames[m], combined_position_data[[i]]$qname[j], sep = ",")
                                         assigned_clipped_qnames <- c(assigned_clipped_qnames, unassigned_qnames[[i]][k])
-                                        position_data$bam_read_position[position_data$qname == combined_position_data[[i]]$qname[j]] <- as.character(new_start_position) # update the bam_read_position column in the position_data data frame with the soft clip corrected start position
+                                        position_data$bam_read_position[position_data$qname == combined_position_data[[i]]$qname[j]] <- as.character(new_start_position) # update the bam_read_position column in the position_data data frame with left the soft clip corrected start position
                                         position_data$read_cigar[position_data$qname == combined_position_data[[i]]$qname[j]] <- paste(as.character(left_clip_length), "M", substring(combined_position_data[[i]]$read_cigar[j], (left_S_index + 1), length(cigar)), sep = "") # update the read_cigar column in the position_data data frame with the left soft clip corrected cigar string
                                         for(n in 1:length(combined_sam_files)){
                                             if(combined_position_data[[i]]$qname[j] %in% combined_sam_files[[i]]$qname){
-                                                combined_sam_files[[i]]$pos[combined_sam_files[[i]]$qname == combined_position_data[[i]]$qname[j]] <- as.character(new_start_position) # update the pos column in the sam_file data frame with the soft clip corrected start position
+                                                combined_sam_files[[i]]$pos[combined_sam_files[[i]]$qname == combined_position_data[[i]]$qname[j]] <- as.character(new_start_position) # update the pos column in the sam_file data frame with the left soft clip corrected start position
                                                 combined_sam_files[[i]]$cigar[combined_sam_files[[i]]$qname == combined_position_data[[i]]$qname[j]] <- paste(as.character(left_clip_length), "M", substring(combined_position_data[[i]]$read_cigar[j], (left_S_index + 1), length(cigar)), sep = "") # update the cigar column in the sam_file data frame with the left soft clip corrected cigar string
                                             }
                                         }
@@ -206,11 +206,11 @@ for(i in 1:length(combined_position_data)){
                                         combined_position_comparison_data[[i]]$clipped_read_count[m] <- as.numeric(combined_position_comparison_data[[i]]$clipped_read_count[m]) + 1
                                         combined_position_comparison_data[[i]]$clipped_read_qnames[m] <- paste(combined_position_comparison_data[[i]]$clipped_read_qnames[m], combined_position_data[[i]]$qname[j], sep = ",")
                                         assigned_clipped_qnames <- c(assigned_clipped_qnames, unassigned_qnames[[i]][k])
-                                        position_data$bam_read_position[position_data$qname == combined_position_data[[i]]$qname[j]] <- as.character(new_end_position) # update the bam_read_position column in the position_data data frame with the soft clip corrected end position
+                                        position_data$bam_read_position[position_data$qname == combined_position_data[[i]]$qname[j]] <- as.character(new_end_position) # update the bam_read_position column in the position_data data frame with the left soft clip corrected end position
                                         position_data$read_cigar[position_data$qname == combined_position_data[[i]]$qname[j]] <- paste(as.character(left_clip_length), "M", substring(combined_position_data[[i]]$read_cigar[j], (left_S_index + 1), length(cigar)), sep = "") # update the read_cigar column in the position_data data frame with the left soft clip corrected cigar string
                                         for(n in 1:length(combined_sam_files)){
                                             if(combined_position_data[[i]]$qname[j] %in% combined_sam_files[[i]]$qname){
-                                                combined_sam_files[[i]]$pos[combined_sam_files[[i]]$qname == combined_position_data[[i]]$qname[j]] <- as.character(new_end_position) # update the pos column in the sam_file data frame with the soft clip corrected end position
+                                                combined_sam_files[[i]]$pos[combined_sam_files[[i]]$qname == combined_position_data[[i]]$qname[j]] <- as.character(new_end_position) # update the pos column in the sam_file data frame with the left soft clip corrected end position
                                                 combined_sam_files[[i]]$cigar[combined_sam_files[[i]]$qname == combined_position_data[[i]]$qname[j]] <- paste(as.character(left_clip_length), "M", substring(combined_position_data[[i]]$read_cigar[j], (left_S_index + 1), length(cigar)), sep = "") # update the cigar column in the sam_file data frame with the left soft clip corrected cigar string
                                             }
                                         }
@@ -254,7 +254,7 @@ for(i in 1:length(combined_position_data)){
                                         position_data$read_cigar[position_data$qname == combined_position_data[[i]]$qname[j]] <- paste(substring(combined_position_data[[i]]$read_cigar[j], 1, (right_S_index - 1)), "M", sep = "") # update the read_cigar column in the position_data data frame with the right soft clip corrected cigar string
                                         for(n in 1:length(combined_sam_files)){
                                             if(combined_position_data[[i]]$qname[j] %in% combined_sam_files[[i]]$qname){
-                                                combined_sam_files[[i]]$pos[combined_sam_files[[i]]$qname == combined_position_data[[i]]$qname[j]] <- as.character(new_end_position) # update the pos column in the sam_file data frame with the soft clip corrected end position
+                                                combined_sam_files[[i]]$pos[combined_sam_files[[i]]$qname == combined_position_data[[i]]$qname[j]] <- as.character(new_end_position) # update the pos column in the sam_file data frame with the right soft clip corrected end position
                                                 combined_sam_files[[i]]$cigar[combined_sam_files[[i]]$qname == combined_position_data[[i]]$qname[j]] <- paste(substring(combined_position_data[[i]]$read_cigar[j], 1, (right_S_index - 1)), "M", sep = "") # update the cigar column in the sam_file data frame with the right soft clip corrected cigar string
                                             }
                                         }
@@ -269,7 +269,7 @@ for(i in 1:length(combined_position_data)){
                                         position_data$read_cigar[position_data$qname == combined_position_data[[i]]$qname[j]] <- paste(substring(combined_position_data[[i]]$read_cigar[j], 1, (right_S_index - 1)), "M", sep = "") # update the read_cigar column in the position_data data frame with the right soft clip corrected cigar string
                                         for(n in 1:length(combined_sam_files[[i]])){
                                             if(combined_position_data[[i]]$qname[j] %in% combined_sam_files[[i]]$qname){
-                                                combined_sam_files[[i]]$pos[combined_sam_files[[i]]$qname == combined_position_data[[i]]$qname[j]] <- as.character(new_start_position) # update the pos column in the sam_file data frame with the soft clip corrected start position
+                                                combined_sam_files[[i]]$pos[combined_sam_files[[i]]$qname == combined_position_data[[i]]$qname[j]] <- as.character(new_start_position) # update the pos column in the sam_file data frame with the right soft clip corrected start position
                                                 combined_sam_files[[i]]$cigar[combined_sam_files[[i]]$qname == combined_position_data[[i]]$qname[j]] <- paste(substring(combined_position_data[[i]]$read_cigar[j], 1, (right_S_index - 1)), "M", sep = "") # update the cigar column in the sam_file data frame with the right soft clip corrected cigar string
                                             }
                                         }

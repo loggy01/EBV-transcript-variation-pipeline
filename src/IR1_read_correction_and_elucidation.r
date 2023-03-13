@@ -3,16 +3,15 @@
 ###################################################################################################################################################################################################################################################################################################################################################################################################################################################################
 # PART TWO OF TWO OF THE IR1 TRANSCRIPT ELUCIDATION PIPELINE (Aaron Logsdon, 2023. Written in R version 4.2.2 (using Bioconductor version 3.16) within Visual Studio Code version 1.76 on macOS Ventura version 13.0)
 # NAME: IR1_read_correction_and_elucidation.r
-# PURPOSE: reveal the exonic structure, promoter usage, 3' splice site usage, and IR1 repeat count of full-length reads from part one if used for EBV transcriptomics
-# Dependencies: 
-    # DEPENDENCIES: 
+# PURPOSE: reveal the exonic structure, promoter usage, 3' splice site usage, and IR1 repeat count of full-length reads from part one (if part one was used for EBV transcriptomics)
+# DEPENDENCIES: 
     # 1) R must be installed locally (see http://lib.stat.cmu.edu/R/CRAN/)
     # 2) The R packages "Biostrings", "IRanges", "stringi", and "tidyverse" must be installed using the R console (see https://www.bioconductor.org/install/)
 # FUNCTIONS:
-    # 1) Adds the W0 exon back to the read sequences where it has been soft-clipped, using a user-defined minimum left clip length to determine which reads to correct. We used 6 as a minimum left clip length for dRNA-seq Oxford Nanopore Technologies data
+    # 1) Adds the W0 exon back to the read sequences where it has been soft-clipped, using a user-defined minimum left clip length to determine which reads to correct. We used 5 as a minimum left clip length for dRNA-seq Oxford Nanopore Technologies data
     # 2) Updates the input sam files for W0 correction and outputs (remember to add the header back) the result to the current working directory (file name format: e.g. HB9_full_length_reads_W0_corrected.sam)
-    # 3) Calculates the size of each exon in IR1-containing reads for each sample using the user-defined start/end windows and splice windows and outputs the result to the current working directory (file name format: e.g. HB9_IR1_read_exons.txt). We used 30 as a start/end window and 2 as a splice window for dRNA-seq Oxford Nanopore Technologies data
-    # 4) Calculates the 3' end splice site and promoter usage of IR1-containing reads
+    # 3) Calculates the nucleotide length of each exon in IR1-containing reads for each sample using the user-defined start/end windows and splice windows and outputs the result to the current working directory (file name format: e.g. HB9_IR1_read_exon_lengths.txt). We used 20 as a start/end window and 2 as a splice window for dRNA-seq Oxford Nanopore Technologies data
+    # 4) Calculates the 3' end element and promoter usage of IR1-containing reads
     # 4) Calculates the IR1-repeat count according to the alignment tool used by the user, for IR1-containing reads for each sample
     # 5) Calculates the IR1-repeat count according to read nucleotide count, for IR1-containing reads for each sample
     # 6) Outputs the results of the previous three steps to the current working directory (file name format: e.g. HB9_IR1_repeat_counts.txt)
@@ -24,7 +23,7 @@
     # 5) The script is optimised for Oxford Nanopore Technologies and may cause suboptimal results when used with other long-read sequencing technologies
     # 6) Users are able to define start/end windows and splice windows for exon and repeat calculations. However, excessviely large windows may result in suboptimal results
 # COMMAND LINE FORMAT: Rscript IR1_read_correction_and_elucidation.r sam_full_length_reads_one.sam,sam_full_length_reads_two.sam,...,sam_full_length_reads_n.sam sam_name_one,sam_name_two,...,sam_name_n sam_genome_reference_one.fasta,sam_genome_reference_two.fasta,...,sam_genome_reference_n.fasta sam_IR1_exon_coordinates_one.bed,sam_IR1_exon_coordinates_two.bed,...,sam_IR1_exon_coordinates_n.bed mininum_W0_clip_length start_end_window splice_window
-# COMMAND LINE EXAMPLE: Rscript ./IR1_read_correction_and_elucidation.r ./HB9_full_length_reads.sam HB9 ./HB9_genome.fasta ./HB9_IR1_exon_coordinates.bed 6 30 2
+# COMMAND LINE EXAMPLE: Rscript ./IR1_read_correction_and_elucidation.r ./HB9_full_length_reads.sam HB9 ./HB9_genome.fasta ./HB9_IR1_exon_coordinates.bed 5 20 2
 # FOLLOW UP: independent analysis of the output files
 ###################################################################################################################################################################################################################################################################################################################################################################################################################################################################
 
@@ -58,7 +57,7 @@ for(i in 1:length(sam_files)){
     for(j in 1:nrow(sample_reads)){
         for(k in 1:nrow(reference_W1_coordinates)){
             if((as.numeric(sample_reads$pos[j]) %in% (as.numeric(reference_W1_coordinates$start[k]) - start_end_window):(as.numeric(reference_W1_coordinates$start[k]) + start_end_window)) | (as.numeric(sample_reads$pos[j]) %in% (as.numeric(reference_W1_prime_coordinates$start[k]) - start_end_window):(as.numeric(reference_W1_prime_coordinates$start[k]) + start_end_window))){
-                sample_Wp_reads <- rbind(sample_Wp_reads, sample_reads[j, ]) # store reads that are within the user-defined window of the W1 or W1_prime exon reference start positions
+                sample_Wp_reads <- rbind(sample_Wp_reads, sample_reads[j, ]) # store reads that are within the user-defined start window of the W1 or W1_prime exon reference start positions
             }
         }
     }
@@ -215,13 +214,13 @@ for(i in 1:length(sam_files)){
                     for(l in 1:nrow(reference_IR1_coordinates)){
                         if(first_exon_found == TRUE){ # if the first exon has been found
                             if(abs(diff(c(exon_start, as.numeric(reference_IR1_coordinates$start[l])))) <= splice_window & abs(diff(c(exon_end, as.numeric(reference_IR1_coordinates$end[l])))) <= start_end_window){
-                                IR1_read_exons[l] <- exon_length # add the exon length to the exon in the IR1 read exons vector
+                                IR1_read_exons[l] <- exon_length # add the exon length to the exon in the IR1 read exons vector based on a user-defined splice window and start/end window
                                 break
                             }
                         }
                         else if(first_exon_found == FALSE){ # if the first exon has not been found
                             if(abs(diff(c(exon_start, as.numeric(reference_IR1_coordinates$start[l])))) <= start_end_window & abs(diff(c(exon_end, as.numeric(reference_IR1_coordinates$end[l])))) <= start_end_window){
-                                IR1_read_exons[l] <- exon_length # add the exon length to the exon in the IR1 read exons vector
+                                IR1_read_exons[l] <- exon_length # add the exon length to the exon in the IR1 read exons vector based on a user-defined start/end window
                                 break
                             }
                         }
@@ -233,7 +232,7 @@ for(i in 1:length(sam_files)){
     }
     colnames(sample_IR1_read_exon_lengths) <- c("qname", reference_IR1_coordinates$exon)
     combined_IR1_read_exon_lengths[[i]] <- sample_IR1_read_exon_lengths
-    write.table(combined_IR1_read_exon_lengths[[i]], paste0(sam_names[i], "_IR1_read_exons.txt"), sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
+    write.table(combined_IR1_read_exon_lengths[[i]], paste0(sam_names[i], "_IR1_read_exon_lengths.txt"), sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
 }
 
 ### Determine the 3' element of the IR1-containing reads ###
@@ -245,11 +244,11 @@ for(i in 1:length(combined_IR1_read_exon_lengths)){
         three_prime_element_index <- 0
         for(k in 2:ncol(sample_exon_lengths)){
             if(sample_exon_lengths[j, k] != "0"){
-                three_prime_element_index <- k # if the current exon is not 0, mark the index of the current exon as the 3' element
+                three_prime_element_index <- k # if the current exon is not of length 0 nt, mark the index of the current exon as the 3' element
             }
         }
         if(three_prime_element_index != 0){
-            sample_three_prime_elements  <- c(sample_three_prime_elements , colnames(sample_exon_lengths)[three_prime_element_index]) # if the 3' element index is not 0, add the 3' element to the vector of 3' elements
+            sample_three_prime_elements  <- c(sample_three_prime_elements , colnames(sample_exon_lengths)[three_prime_element_index]) # if the 3' element index is not of length 0 nt, add the 3' element to the vector of 3' elements
         }
         else{
             sample_three_prime_elements  <- c(sample_three_prime_elements , NA) # if the 3' element index is 0, add NA to the vector of 3' elements
@@ -295,7 +294,7 @@ for(i in 1:length(combined_IR1_read_exon_lengths)){
             }
         }
         if(repeat_count == 0 & as.numeric(combined_reads[[i]]$pos[combined_reads[[i]]$qname == sample_W_exon_lengths$qname[j]]) >= as.numeric(reference_IR1_coordinates$end[reference_IR1_coordinates$exon == "Y1"])){
-            repeat_count <- NA
+            repeat_count <- NA 
         }
         if(W0_used == FALSE & as.numeric(combined_reads[[i]]$pos[combined_reads[[i]]$qname == sample_W_exon_lengths$qname[j]]) <= as.numeric(reference_IR1_coordinates$end[reference_IR1_coordinates$exon == "C1"])){
             promoter <- "Cp" # assign the promoter as Cp if W0 is not used and the read begins before the reference C1 exon end
@@ -365,8 +364,8 @@ for(i in 1:length(combined_IR1_read_exon_lengths)){
                         }
                         nucleotide_count <- nucleotide_count + event_length # add the event length to the count
                     }
-                    else if(cigar[k] == "I"){ # insertions below 2 are not added (average Oxford nanopore indel is ~1.5bp)
-                        if(event_length >= 2){ # check if the insertion is of significant length to add (setting as 10 removes sequencing error noise and allows us to concentrate on interesting events like extra W exons)
+                    else if(cigar[k] == "I"){ # check for an insertion (I) event
+                        if(event_length >= 2){ # insertions below 2 are not added (average Oxford nanopore indel is ~1.5bp)
                             if(reference_position >= (as.numeric(Y1_start_position) - 1)){ # check if the current position (on the reference genome) is past the Y1 exon start
                                 nucleotide_count <- nucleotide_count + (reference_position - (as.numeric(Y1_start_position) - 1)) # add the correct number of nucleotides to the count
                                 break
@@ -374,7 +373,7 @@ for(i in 1:length(combined_IR1_read_exon_lengths)){
                             nucleotide_count <- nucleotide_count + event_length # add the event length to the count
                         }
                     }
-                    else if(cigar[k] == "D"){
+                    else if(cigar[k] == "D"){ # check for a deletion (D) event
                         if(event_length <= 2){ # deletions of 2 and below are added back (average Oxford nanopore indel is ~1.5bp)
                             if(reference_position >= (as.numeric(Y1_start_position) - 1)){ # check if the current position (on the reference genome) is past the Y1 exon start
                                 nucleotide_count <- nucleotide_count + (reference_position - (as.numeric(Y1_start_position) - 1)) # add the correct number of nucleotides to the count
