@@ -1,1 +1,1 @@
-# IR1-transcript-elucidation
+# IR1-transcript-elucidation-pipeline
