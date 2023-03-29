@@ -39,8 +39,7 @@ Input:
 5. Window size for capture two (integer). We use 20.
 6. Window size for capture stage three (integer). We use 20.
 
-Output:
-Four text files (for each input SAM) in your working directory:
+Output (four text files (for each input SAM) in your working directory):
 1. ./sam_name_full_length_transcripts.sam
 2. ./sam_name_3_prime_intact_transcripts.sam
 3. ./sam_name_5_prime_intact_transcripts.sam
@@ -81,8 +80,7 @@ Input:
 6. Window size for transcript start and end variability from matching IR1 cooridnates exon BED file (integer). We use 20.
 7. Window size for exon splice position variability from matching IR1 cooridnates exon BED file (integer). We use 2.
 
-Output:
-Three text files (for each input SAM) in your working directory:*separate paragraph*
+Output (three text files (for each input SAM) in your working directory):
 1. ./sample_name_full_length_transcripts_final.sam (remember to add back the header yourself)
 2. ./sam_name_IR1_exon_compositions.txt
 3. ./sam_name_IR1_copy_number_variation.txt
