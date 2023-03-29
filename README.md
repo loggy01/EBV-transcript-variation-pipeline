@@ -77,8 +77,8 @@ Input:
 3. Matching list of reference genome FASTA files (list of directories)
 4. Matching list of IR1 exon coordinates BED file (list of directories)
 5. Minimum clip size for W0 add back consideration (integer). We use 5.
-6. Window size for transcript start and end variability from matching IR1 cooridnates exon BED file (integer). We use 20.
-7. Window size for exon splice position variability from matching IR1 cooridnates exon BED file (integer). We use 2.
+6. Window size for transcript start and end variability from matching IR1 exon cooridnates BED file (integer). We use 20.
+7. Window size for exon splice position variability from matching IR1 exon cooridnates BED file (integer). We use 2.
 
 Output (three text files (for each input SAM) in your working directory):
 1. ./sample_name_full_length_transcripts_final.sam (remember to add back the header yourself)
