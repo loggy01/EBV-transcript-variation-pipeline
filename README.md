@@ -6,7 +6,33 @@ A pipeline for analysing IR1 copy number and splice variation of IR1-centred tra
 
 2. [IR1_transcript_variation_calculation.r](https://github.com/loggy01/IR1-transcript-elucidation-pipeline/blob/main/src/IR1_read_correction_and_elucidation.r) calculates the IR1 copy number and exon composition of full-length IR1-centred transcripts.
 
-For exemplar data preprocessing steps see INSERT HERE.
+For exemplar data preprocessing steps see [here]().
 
 
-## Full length transcript identification and isolation
+## full_length_transcript_identification.r
+
+### Purpose
+
+Separate each of an *n* number of long-read RNA-seq SAM files into four output SAM files:
+
+1. Full length transcripts
+2. 3' intact transcripts
+3. 5' intact transcripts
+4. Unassigned reads
+
+### Dependencies
+
+[R](http://lib.stat.cmu.edu/R/CRAN/) must be installed locally along with the packages [data.table](https://cran.r-project.org/web/packages/data.table/index.html), [stringi](https://cran.r-project.org/web/packages/stringi/index.html), and [tidyverse](https://cran.r-project.org/web/packages/tidyverse/index.html).
+
+### Functions
+1. Captures reproducible 5' and 3' ends based on a user-defined mininum group size occuring within a user-defined window size (±).
+3. Captures uncaptured 5' and 3' ends within a user-defined window size (±) of the centre of a reproducible group.
+4. Reverses soft-clipping and captures 5' and 3' ends now within a user-defined window size (±).
+5. Assigns reads to one of four output SAM files based on whether a read has a reproducile 5' and/or 3' end.
+
+### Limitations
+1. Secondary and supplementary reads are not supported and must be removed from SAM files prior. See [here]().
+2. Padded sequences are not supported.
+3. SAM files must have cigar strings in original format (M, not = and X).
+4. Each input SAM file must have header removed prior. See [here]().
+
