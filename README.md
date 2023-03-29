@@ -91,7 +91,3 @@ Three text files (for each input SAM) in your working directory:
 ### Command line
 ````shell
 Rscript ./IR1_transcript_variation_calculation.r ./full_length_transcripts_one.sam,./full_length_transcripts_two.sam name_one,name_two ./ref_one.fa,./ref_two.fa ./coordinates_one.bed,./coordinates_two.bed 5 20 2
-
-./sam_one.sam,./sam_two.sam name_one,name_two 2 5 20 20
-````
-
