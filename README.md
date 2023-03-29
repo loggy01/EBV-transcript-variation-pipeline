@@ -82,7 +82,7 @@ Input:
 7. Window size for exon splice position variability from matching IR1 cooridnates exon BED file (integer). We use 2.
 
 Output:
-Three text files (for each input SAM) in your working directory:
+Three text files (for each input SAM) in your working directory:*separate paragraph*
 1. ./sample_name_full_length_transcripts_final.sam (remember to add back the header yourself)
 2. ./sam_name_IR1_exon_compositions.txt
 3. ./sam_name_IR1_copy_number_variation.txt
