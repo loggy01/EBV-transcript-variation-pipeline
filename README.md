@@ -34,10 +34,10 @@ To separate each of an *n* number of long-read RNA-seq SAM files into four outpu
 Input: 
 1. *n* number of SAM files (list of directories).
 2. Matching list of SAM file names (list of strings). 
-3. Minimum group size for capture stage one (integer). We use 5.
-4. Window size for capture stage one (integer). We use 2.
-5. Window size for capture two (integer). We use 20.
-6. Window size for capture stage three (integer). We use 20.
+3. Window size for capture stage one (integer). We use 2.
+4. Minimum group size for capture stage one (integer). We use 5.
+6. Window size for capture two (integer). We use 20.
+7. Window size for capture stage three (integer). We use 20.
 
 Output (four text files (for each input SAM) in your working directory):
 1. ./sam_name_full_length_transcripts.sam
