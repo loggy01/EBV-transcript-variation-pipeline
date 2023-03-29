@@ -57,7 +57,7 @@ Rscript ./full_length_transcript_identification.r ./sam_one.sam,./sam_two.sam na
 To calculate IR1 copy number and splice variation of full-length IR1-centred transcripts from ./full_length_transcripts.sam.
 
 ### Dependencies
-[R](http://lib.stat.cmu.edu/R/CRAN/) must be installed locally along with [Bioconductor](https://www.bioconductor.org/install/) and the packages [Biostrings](https://bioconductor.org/packages/release/bioc/html/Biostrings.html), [IRanges](https://bioconductor.org/packages/release/bioc/html/IRanges.html), [stringi](https://cran.r-project.org/web/packages/stringi/index.html), and [tidyverse](https://cran.r-project.org/web/packages/tidyverse/index.html)
+[R](http://lib.stat.cmu.edu/R/CRAN/) must be installed locally along with [Bioconductor](https://www.bioconductor.org/install/) and the packages [Biostrings](https://bioconductor.org/packages/release/bioc/html/Biostrings.html), [IRanges](https://bioconductor.org/packages/release/bioc/html/IRanges.html), [stringi](https://cran.r-project.org/web/packages/stringi/index.html), and [tidyverse](https://cran.r-project.org/web/packages/tidyverse/index.html).
 
 ### Functions
 1. Adds back the W0 exon to transcripts in which it has been erroneously clipped off, using a user-defined mininum soft-clip size for consideration, and      outputs the updated SAM files.
