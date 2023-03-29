@@ -1,6 +1,7 @@
 # Table of contents
 * [IR1 transcript variation pipeline](#headers)
 ..* [full_length_transcript_identification.r](#headers) 
+...snip...
 <a name="headers"/>
 
 # IR1 transcript variation pipeline
