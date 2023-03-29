@@ -1,4 +1,4 @@
-qname	promoter	3_prime_element	W1_vs_W1_prime	aligner_IR1_repeat_count	nucleotide_IR1_repeat_count
+qname	promoter	W1_vs_W1_prime	3_prime_element	alignment_count	distance_count
 837f676e-ad33-4c8a-84eb-fbfba3afeaf0	Cp	W1	Y2	3	3
 0e14eb38-f477-4f66-b601-bc134c3ef620	Cp	W1	YH	6	6
 61bddd87-5f21-4378-b67c-760d27fadd7a	Cp	W1	BHRF1.2	5	6
