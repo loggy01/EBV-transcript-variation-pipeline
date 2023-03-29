@@ -1,7 +1,6 @@
 # Table of Contents  
 [IR1 transcript variation pipeline](#headers)
-[full_length_transcript_identification.r](#emphasis)
-<a name="headers"/>
+[full_length_transcript_identification.r](#headers)
 
 # IR1 transcript variation pipeline
 A pipeline for analysing IR1 copy number and splice variation of IR1-centred transcripts in Epstein-Barr virus (EBV) long-read RNA-seq datasets. The pipeline is implemented in two R scripts that are command line executable:
