@@ -49,6 +49,8 @@ Four text files in your working directory:
 
 ### Command line
 ````shell
-Rscript ./full_length_long_read_identification.r ./sam_one.sam,./sam_two name_one,name_two 2 5 20 20
+Rscript ./full_length_transcript_identification.r ./sam_one.sam,./sam_two name_one,name_two 2 5 20 20
 ````
 
+
+## IR1_transcript_variation_calculation.r
