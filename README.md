@@ -1,6 +1,6 @@
 # Table of contents
 1. [IR1 transcript variation pipeline](https://github.com/loggy01/IR1-transcript-variation-pipeline#ir1-transcript-variation-pipeline)
-..1. [full_length_transcript_identification.r](https://github.com/loggy01/IR1-transcript-variation-pipeline#full_length_transcript_identificationr) 
+..1. [full_length_transcript_identification.r](https://github.com/loggy01/IR1-transcript-variation-pipeline#full_length_transcript_identificationr)... 
 
 
 # IR1 transcript variation pipeline
