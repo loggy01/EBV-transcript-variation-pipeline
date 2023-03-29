@@ -1,33 +1,8 @@
 #!/usr/bin/Rscript --vanilla
 
-###############################################################################################################################################################################################################################################################################################
-# PART ONE OF TWO OF THE IR1 TRANSCRIPT ELUCIDATION PIPELINE (Aaron Logsdon, 2023. Written in R version 4.2.2 (using Bioconductor version 3.16) within Visual Studio Code version 1.76 on macOS Ventura version 13.0)
-# NAME: full_length_long_read_identification.r
-# PURPOSE: separate n number of sam files containing long read data into four read sets for each sam file:
-    # 1) full length reads
-    # 2) 5' end broken reads
-    # 3) 3' end broken reads
-    # 4) unassigned reads
-# DEPENDENCIES: 
-    # 1) R must be installed locally (see http://lib.stat.cmu.edu/R/CRAN/)
-    # 2) The R packages "data.table", "stringi", and "tidyverse" must be installed using the R console (see https://www.bioconductor.org/install/)
-# FUNCTIONS: 
-    # 1) Extracts read start and end positions from n number of input sam files
-    # 2) Assigns significant windows of read starts/ends using a user-defined window size (± from reference position) and user-defined minimum window read count. We used a window size of 2 and minimum window read count of 5 for dRNA-seq Oxford Nanopore Technologies data
-    # 3) Assigns unassigned and potentially significant read starts/ends missed by the previous step to significant windows based on a user defined window size (± from center of significant window in question). We used a window size of 20 for dRNA-seq Oxford Nanopore Technologies data
-    # 4) Assigns read starts/ends missed by the previous steps due to soft clipping to significant windows, again using a user defined window size (± from center of significant window in question). We used a window size of 20 for dRNA-seq Oxford Nanopore Technologies data
-    # 5) Updates each input sam file for soft clipping correction from the previous step
-    # 6) Assigns reads to the mentioned read sets based on whether they appear in significant start and end windows, only significant start windows, only significant end windows, or neither respectively
-    # 7) Outputs the four read sets from each sam file into the current working directory (file name format: e.g. HB9_full_length_reads.sam)
-# LIMITATIONS:
-    # 1) Secondary and supplementary alignments are not supported and must be removed prior using samtools on the command line (samtools view -F 256 -F 2048 input_sam > output_sam)
-    # 2) Padding of sequences is not supported (this is only relevant if multiple sequence alignment was performed prior)
-    # 3) Cigar strings must be in the original format aka using M instead of = and X (most alignment tools allow the choice of format)
-    # 4) Each input sam file must be edited prior to remove the qual column (the script adds this back) and header (the user must add this back after) using samtools on the command line (samtools view input_sam | cut -f 1-10 > output_sam)
-# COMMAND LINE FORMAT: Rscript full_length_long_read_identification.r sam_one.sam,sam_two.sam,...,sam_n.sam sam_name_one,sam_name_two,...,sam_name_n significance_window mininum_significant_read_count noise_window clip_window
-# COMMAND LINE EXAMPLE: Rscript ./full_length_long_read_identification.r ./HB9.sam HB9 2 5 20 20
-# FOLLOW UP: Output full length read sam files should be passed to the next script in the pipeline (IR1_read_correction_and_elucidation.r)
-###############################################################################################################################################################################################################################################################################################
+#################################################################################
+# PART ONE OF TWO OF THE IR1 TRANSCRIPT VARIATION PIPELINE (Aaron Logsdon, 2023)
+#################################################################################
 
 ### Load packages ###
 library(data.table)
@@ -43,7 +18,7 @@ mininum_significant_read_count <- as.numeric(args[4])
 noise_window <- as.numeric(args[5])
 clip_window <- as.numeric(args[6])
 
-### Identify and store read starts (plus strand) and ends (minus strand) ###
+### Identify and store read 5' starts (plus strand) and ends (minus strand) ###
 position_data <- data.frame(matrix(nrow = 0, ncol = 6))
 for(i in 1:length(sam_files)){
     sam_file <- read.table(sam_files[i], sep = "\t", header = FALSE)
@@ -325,7 +300,7 @@ combined_start_only_assigned_reads <- rbind(plus_strand_read_sets[[2]], minus_st
 combined_end_only_assigned_reads <- rbind(plus_strand_read_sets[[3]], minus_strand_read_sets[[3]])
 combined_unassigned_reads <- rbind(plus_strand_read_sets[[4]], minus_strand_read_sets[[4]])
 combined_reads <- list(combined_dual_assigned_reads, combined_start_only_assigned_reads, combined_end_only_assigned_reads, combined_unassigned_reads)
-read_set_names <- c("full_length_reads", "5'_end_broken_reads", "3'_end_broken_reads", "unassigned_reads") # dual assigned = full length, start only assigned = 5' end broken, end only assigned = 3' end broken, unassigned = unassigned
+read_set_names <- c("full_length_transcripts", "5'_intact_transcripts", "3'_intact_transcripts", "unassigned_reads") # dual assigned = full length, start only assigned = 5' end broken, end only assigned = 3' end broken, unassigned = unassigned
 for(i in 1:length(combined_reads)){
     for(j in 1:length(sam_files)){
         sam_file <- combined_sam_files[[j]]

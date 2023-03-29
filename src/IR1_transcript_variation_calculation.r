@@ -1,35 +1,13 @@
 #!/usr/bin/Rscript --vanilla
 
-###################################################################################################################################################################################################################################################################################################################################################################################################################################################################
-# PART TWO OF TWO OF THE IR1 TRANSCRIPT ELUCIDATION PIPELINE (Aaron Logsdon, 2023. Written in R version 4.2.2 (using Bioconductor version 3.16) within Visual Studio Code version 1.76 on macOS Ventura version 13.0)
-# NAME: IR1_read_correction_and_elucidation.r
-# PURPOSE: reveal the exonic structure, promoter usage, 3' splice site usage, and IR1 repeat count of full-length reads from part one (if part one was used for EBV transcriptomics)
-# DEPENDENCIES: 
-    # 1) R must be installed locally (see http://lib.stat.cmu.edu/R/CRAN/)
-    # 2) The R packages "Biostrings", "IRanges", "stringi", and "tidyverse" must be installed using the R console (see https://www.bioconductor.org/install/)
-# FUNCTIONS:
-    # 1) Adds the W0 exon back to the read sequences where it has been soft-clipped, using a user-defined minimum left clip length to determine which reads to correct. We used 5 as a minimum left clip length for dRNA-seq Oxford Nanopore Technologies data
-    # 2) Updates the input sam files for W0 correction and outputs (remember to add the header back) the result to the current working directory (file name format: e.g. HB9_full_length_reads_W0_corrected.sam)
-    # 3) Calculates the nucleotide length of each exon in IR1-containing reads for each sample using the user-defined start/end windows and splice windows and outputs the result to the current working directory (file name format: e.g. HB9_IR1_read_exon_lengths.txt). We used 20 as a start/end window and 2 as a splice window for dRNA-seq Oxford Nanopore Technologies data
-    # 4) Calculates the 3' end element and promoter usage of IR1-containing reads
-    # 4) Calculates the IR1-repeat count according to the alignment tool used by the user, for IR1-containing reads for each sample
-    # 5) Calculates the IR1-repeat count according to read nucleotide count, for IR1-containing reads for each sample
-    # 6) Outputs the results of the previous three steps to the current working directory (file name format: e.g. HB9_IR1_repeat_counts.txt)
-# LIMITATIONS:
-    # 1) The script is sepcific for EBV transcriptomic usage
-    # 2) The script requires the IR1_exon_coordinates.bed file (provided in test data) to work. Exon names must be left as is but coordinates can be changed to fit the user's genome references. Also, the number of W exon groups can be adapted to match the number of IR1 repeats in the user's genome reference (ensure W0, W1, W1_prime, W2, W2_delta are present for each IR1 repeat)
-    # 3) The input sam files must be headerless and headers must be added back by the user after
-    # 4) Adding back W0 to reads can result in subtle variability around the W1 and W1' start sites of reads. However, this is accounted for in calculations
-    # 5) The script is optimised for Oxford Nanopore Technologies and may cause suboptimal results when used with other long-read sequencing technologies
-    # 6) Users are able to define start/end windows and splice windows for exon and repeat calculations. However, excessviely large windows may result in suboptimal results
-# COMMAND LINE FORMAT: Rscript IR1_read_correction_and_elucidation.r sam_full_length_reads_one.sam,sam_full_length_reads_two.sam,...,sam_full_length_reads_n.sam sam_name_one,sam_name_two,...,sam_name_n sam_genome_reference_one.fasta,sam_genome_reference_two.fasta,...,sam_genome_reference_n.fasta sam_IR1_exon_coordinates_one.bed,sam_IR1_exon_coordinates_two.bed,...,sam_IR1_exon_coordinates_n.bed mininum_W0_clip_length start_end_window splice_window
-# COMMAND LINE EXAMPLE: Rscript ./IR1_read_correction_and_elucidation.r ./HB9_full_length_reads.sam HB9 ./HB9_genome.fasta ./HB9_IR1_exon_coordinates.bed 5 20 2
-# FOLLOW UP: independent analysis of the output files
-###################################################################################################################################################################################################################################################################################################################################################################################################################################################################
+#################################################################################
+# PART TWO OF TWO OF THE IR1 transcript variation pipeline (Aaron Logsdon, 2023)
+#################################################################################
 
 ### Load libraries ###
 library(Biostrings)
 library(IRanges)
+library(plyr)
 library(stringi)
 library(tidyverse)
 
@@ -101,7 +79,7 @@ for(i in 1:length(sam_files)){
         }
     }
     combined_reads[[i]] <- sample_reads
-    write.table(combined_reads[[i]], paste0(sam_names[i], "_full_length_reads_W0_corrected.sam"), sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE) # output the headerless sam file corrected for W0 exon clipping
+    write.table(combined_reads[[i]], paste0(sam_names[i], "_full_length_transcripts_final.sam"), sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE) # output the headerless sam file corrected for W0 exon clipping
 }
 
 ### Calculate the size of each exon in each IR1-containing read and output the results ###
@@ -232,7 +210,7 @@ for(i in 1:length(sam_files)){
     }
     colnames(sample_IR1_read_exon_lengths) <- c("qname", reference_IR1_coordinates$exon)
     combined_IR1_read_exon_lengths[[i]] <- sample_IR1_read_exon_lengths
-    write.table(combined_IR1_read_exon_lengths[[i]], paste0(sam_names[i], "_IR1_read_exon_lengths.txt"), sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
+    write.table(combined_IR1_read_exon_lengths[[i]], paste0(sam_names[i], "_IR1_exon_compositions.txt"), sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
 }
 
 ### Determine the 3' element of the IR1-containing reads ###
@@ -394,7 +372,8 @@ for(i in 1:length(combined_IR1_read_exon_lengths)){
             nucleotide_count <- nucleotide_count - 27 # adjust nucleotide count for W0 in relevant reads
         }
         if(nucleotide_count > 0){ # check if the nucleotide count is greater than 0
-            repeat_count <- round(as.numeric(nucleotide_count) / average_W1W2_length, digits = 1) # calculate the repeat count
+            repeat_count <- nucleotide_count / average_W1W2_length # calculate the repeat count
+            repeat_count <- round_any(repeat_count, 0.5) # round the repeat count to the nearest 0.5
         }
         else if(nucleotide_count == 0){ # check if the nucleotide count is equal to 0
             repeat_count <- NA
@@ -403,5 +382,5 @@ for(i in 1:length(combined_IR1_read_exon_lengths)){
     }
     combined_IR1_repeat_counts[[i]] <- cbind(combined_aligner_IR1_repeat_counts[[i]], sample_nucleotide_IR1_repeat_counts)
     colnames(combined_IR1_repeat_counts[[i]]) <- c(colnames(combined_aligner_IR1_repeat_counts[[i]]), "nucleotide_IR1_repeat_count")
-    write.table(combined_IR1_repeat_counts[[i]], file = paste0(sam_names[i], "_IR1_repeat_counts.txt"), sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
+    write.table(combined_IR1_repeat_counts[[i]], file = paste0(sam_names[i], "_IR1_copy_number_variation.txt"), sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
 }
