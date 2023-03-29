@@ -67,7 +67,7 @@ To calculate IR1 copy number and splice variation of full-length IR1-centred tra
 5. Outputs IR1 copy number variation text file and exon composition text file for each input SAM file.
 
 ### Limitations 
-1. The script requires the pipeline's IR1 exon coordinates BED file to work (see [here](https://github.com/loggy01/IR1-transcript-elucidation-pipeline/blob/main/examples/IR1_read_correction_and_elucidation/input.bed), which cannot be changed a part from to add or remove IR1 copies (each copy must have an entry for W0, W1, W1_prime, W2, W2_prime).
+1. The script requires the pipeline's IR1 exon coordinates BED file to work (see [here](https://github.com/loggy01/IR1-transcript-elucidation-pipeline/blob/main/examples/IR1_read_correction_and_elucidation/input.bed)), which cannot be changed a part from to add or remove IR1 copies (each copy must have an entry for W0, W1, W1_prime, W2, W2_prime).
 2. The script is optimised for Oxford Nanopore Technologies data and may perform sub-optimally with other long-read RNA-seq technologies.
 
 ### Input and output
