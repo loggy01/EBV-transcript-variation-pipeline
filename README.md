@@ -3,7 +3,7 @@ A pipeline for analysing IR1 copy number and splice variation of IR1-centred tra
 1. [full_length_transcript_identification.r](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/src/full_length_transcript_identification.r) isolates full-length transcripts from long-read SAM files (must only contain EBV reads. See [here]()).
 2. [IR1_transcript_variation_calculation.r](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/src/IR1_transcript_variation_calculation.r) calculates the IR1 copy number and exon composition of full-length IR1-centred transcripts.
 
-For exemplar data preprocessing steps see [here]() and [here]().
+For exemplar data preprocessing steps see [here]() and [here](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/Additional%20files/bam_filtration.r).
 
 
 ## full_length_transcript_identification.r
