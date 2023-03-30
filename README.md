@@ -75,7 +75,7 @@ Input:
 1. *n* number of ./full_length_transcripts.sam from full_length_transcript_identification.r (list of directories)
 2. Matching list of SAM file names (list of strings).
 3. Matching list of reference genome FASTA files (list of directories)
-4. Matching list of IR1 exon coordinates BED file (list of directories)
+4. Matching list of IR1 exon coordinates BED files (list of directories)
 5. Minimum clip size for W0 add back consideration (integer). We use 5.
 6. Window size for transcript start and end variability from matching IR1 exon cooridnates BED file (integer). We use 20.
 7. Window size for exon splice position variability from matching IR1 exon cooridnates BED file (integer). We use 2.
