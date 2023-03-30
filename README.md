@@ -1,9 +1,9 @@
 # IR1 transcript variation pipeline
 A pipeline for analysing IR1 copy number and splice variation of IR1-centred transcripts in Epstein-Barr virus long-read RNA-seq datasets. The pipeline is implemented in two R scripts which can be downloaded and run on the command line:
-1. [full_length_transcript_identification.r](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/src/full_length_transcript_identification.r) isolates full-length transcripts from long-read SAM files (must only contain EBV reads. See [here]()).
+1. [full_length_transcript_identification.r](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/src/full_length_transcript_identification.r) isolates full-length transcripts from long-read SAM files (must only contain EBV reads. See [here](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/Additional%20files/command_lines.docx)).
 2. [IR1_transcript_variation_calculation.r](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/src/IR1_transcript_variation_calculation.r) calculates the IR1 copy number and exon composition of full-length IR1-centred transcripts.
 
-For exemplar data preprocessing steps see [here]() and [here](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/Additional%20files/bam_filtration.r).
+For exemplar data preprocessing steps see [here](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/Additional%20files/command_lines.docx) and [here](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/Additional%20files/bam_filtration.r).
 
 
 ## full_length_transcript_identification.r
@@ -25,10 +25,10 @@ To separate each of an *n* number of long-read RNA-seq SAM files into four outpu
 5. Assigns reads to one of four output SAM files based on whether a read has a reproducile 5' and/or 3' end.
 
 ### Limitations
-1. Secondary and supplementary reads are not supported and must be removed from SAM files prior. See [here]().
+1. Secondary and supplementary reads are not supported and must be removed from SAM files prior. See [here](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/Additional%20files/command_lines.docx).
 2. Padded sequences are not supported.
 3. SAM files must have cigar strings in original format (M, not = and X).
-4. Each input SAM file must have its header removed prior. See [here]().
+4. Each input SAM file must have its header removed prior. See [here](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/Additional%20files/command_lines.docx).
 
 ### Input and output
 Input: 
