@@ -41,8 +41,8 @@ Input:
 
 Output (four text files (for each input SAM) in your working directory):
 1. ./sam_name_full_length_transcripts.sam
-2. ./sam_name_3_prime_intact_transcripts.sam
-3. ./sam_name_5_prime_intact_transcripts.sam
+2. ./sam_name_3'_intact_transcripts.sam
+3. ./sam_name_5'_intact_transcripts.sam
 4. ./sam_name_unassigned_reads.sam
 
 ### Command line
