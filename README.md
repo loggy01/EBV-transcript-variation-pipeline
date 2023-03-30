@@ -19,9 +19,9 @@ To separate each of an *n* number of long-read RNA-seq SAM files into four outpu
 [R](http://lib.stat.cmu.edu/R/CRAN/) must be installed locally along with the packages [data.table](https://cran.r-project.org/web/packages/data.table/index.html), [stringi](https://cran.r-project.org/web/packages/stringi/index.html), and [tidyverse](https://cran.r-project.org/web/packages/tidyverse/index.html).
 
 ### Functions
-1. Capture stage one: captures reproducible 5' and 3' ends based on a user-defined mininum group size occuring within a user-defined window size (±).
+1. Capture stage one: captures reproducible 5' and 3' ends based on a user-defined mininum group size occuring within a user-defined window size (±) from a reference read.
 3. Capture stage two: captures uncaptured 5' and 3' ends within a user-defined window size (±) from the centre of a reproducible group.
-4. Capture stage three: reverses soft-clipping and captures 5' and 3' ends now within a user-defined window size (±).
+4. Capture stage three: reverses soft-clipping and captures 5' and 3' ends now within a user-defined window size (±) from the centre of a reproducible group.
 5. Assigns reads to one of four output SAM files based on whether a read has a reproducile 5' and/or 3' end.
 
 ### Limitations
