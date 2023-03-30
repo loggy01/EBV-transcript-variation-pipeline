@@ -235,7 +235,7 @@ for(i in 1:length(combined_IR1_read_exon_lengths)){
     combined_three_prime_elements[[i]] <- sample_three_prime_elements
 }
 
-### Calculate the number of IR1 repeats according to the alignment tool used, in IR1-containing reads ###
+### Calculate the number of IR1 repeats according to the alignment tool used (alignment_count), in IR1-containing reads ###
 combined_aligner_IR1_repeat_counts <- vector(mode = "list", length = length(sam_files))
 for(i in 1:length(combined_IR1_read_exon_lengths)){
     sample_W_exon_lengths <- combined_IR1_read_exon_lengths[[i]][, grepl("^W", names(combined_IR1_read_exon_lengths[[i]]))]
@@ -286,11 +286,11 @@ for(i in 1:length(combined_IR1_read_exon_lengths)){
         sample_aligner_IR1_repeat_counts <- rbind(sample_aligner_IR1_repeat_counts, c(sample_W_exon_lengths$qname[j], promoter, W1_or_W1_prime_used, repeat_count))
     }
     sample_aligner_IR1_repeat_counts <- add_column(sample_aligner_IR1_repeat_counts, combined_three_prime_elements[[i]], .after = 3)
-    colnames(sample_aligner_IR1_repeat_counts) <- c("qname", "promoter", "3_prime_element", "W1_vs_W1_prime", "aligner_IR1_repeat_count")
+    colnames(sample_aligner_IR1_repeat_counts) <- c("qname", "promoter", "W1_vs_W1_prime", "3_prime_element", "alignment_count")
     combined_aligner_IR1_repeat_counts[[i]] <- sample_aligner_IR1_repeat_counts
 }
 
-### Calculate the number of IR1 repeats according to nucleotide count, in IR1-containing reads ###
+### Calculate the number of IR1 repeats according to nucleotide count (this is just another term for distance count), in IR1-containing reads ###
 combined_IR1_repeat_counts <- vector(mode = "list", length = length(sam_files))
 for(i in 1:length(combined_IR1_read_exon_lengths)){
     sample_IR1_read_exon_lengths <- combined_IR1_read_exon_lengths[[i]]
@@ -381,6 +381,6 @@ for(i in 1:length(combined_IR1_read_exon_lengths)){
         sample_nucleotide_IR1_repeat_counts <- c(sample_nucleotide_IR1_repeat_counts, repeat_count)
     }
     combined_IR1_repeat_counts[[i]] <- cbind(combined_aligner_IR1_repeat_counts[[i]], sample_nucleotide_IR1_repeat_counts)
-    colnames(combined_IR1_repeat_counts[[i]]) <- c(colnames(combined_aligner_IR1_repeat_counts[[i]]), "nucleotide_IR1_repeat_count")
+    colnames(combined_IR1_repeat_counts[[i]]) <- c(colnames(combined_aligner_IR1_repeat_counts[[i]]), "distance_count")
     write.table(combined_IR1_repeat_counts[[i]], file = paste0(sam_names[i], "_IR1_copy_number_variation.txt"), sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
 }
