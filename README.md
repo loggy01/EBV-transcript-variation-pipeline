@@ -64,7 +64,7 @@ To calculate IR1 copy number and alternative splicing diversity of Cp- and Wp-in
 2. Calculates the aligned exon content in each Cp- and Wp-initiated transcript using two (user-defined) window sizes to account for position variability of 5' and 3' exons and internal exons respectively. 
 3. Calculates the diversity of IR1 copy number in Cp- and Wp-initiated transcripts based on the number of aligned W1, W1', W2, and W2' exons in each read. This is termed the *alignment count* and only includes aligned IR1 copies.
 4. Calculates the diversity of IR1 copy number in Cp- and Wp-initiated transcripts based on the size of the aligned IR1 compoent of each read. This is termed the *distance count* and includes aligned and misaligned IR1 copies.
-5. Outputs a text file containing the aligned exon content of each read and another text file containing IR1 copy number diversity as calculated by the alignment an distance count, for each input headerless SAM file.
+5. Outputs a text file containing the aligned exon content of each read and another text file containing IR1 copy number diversity as calculated by the alignment and distance counts, for each input headerless SAM file.
 
 ### Limitations 
 1. The script requires the pipeline's EBV exon coordinates BED file to work (see [here](https://github.com/loggy01/EBV-transcript-variation-pipeline/blob/main/examples/transcript_variation_calculation/input.bed)), which cannot be changed a part from to add or remove IR1 copies (each copy must have an entry for W0, W1, W1_prime, W2, W2_prime). The default is six copies.
