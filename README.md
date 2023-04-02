@@ -82,8 +82,8 @@ Input:
 
 Output (per input headerless SAM file):
 1. ./sample_name_full_length_transcripts_final.sam
-2. ./sam_name_IR1_exon_compositions.txt
-3. ./sam_name_IR1_copy_number_variation.txt
+2. ./sam_name_exon_contents.txt
+3. ./sam_name_IR1_copy_number_diversity.txt
 
 ### Command line
 ````shell
