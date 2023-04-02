@@ -1,7 +1,7 @@
 #!/usr/bin/Rscript --vanilla
 
 #################################################################################
-# PART TWO OF TWO OF THE IR1 transcript variation pipeline (Aaron Logsdon, 2023)
+# PART TWO OF TWO OF THE EBV transcript variation pipeline (Aaron Logsdon, 2023)
 #################################################################################
 
 ### Load libraries ###
@@ -13,10 +13,10 @@ library(tidyverse)
 
 ### Initiate user input ###
 args <- commandArgs(trailingOnly = TRUE)
-sam_files <- strsplit(args[1], ",")[[1]]
+sam_files <- strsplit(args[1], ",")[[1]] # headerless
 sam_names <- strsplit(args[2], ",")[[1]]
 sam_references <- strsplit(args[3], ",")[[1]]
-sam_reference_IR1_coordinates <- strsplit(args[4], ",")[[1]]
+sam_reference_IR1_coordinates <- strsplit(args[4], ",")[[1]] # IR1 just means EBV here
 mininum_W0_clip_length <- as.numeric(args[5])
 start_end_window <- as.numeric(args[6])
 splice_window <- as.numeric(args[7])
@@ -39,42 +39,45 @@ for(i in 1:length(sam_files)){
             }
         }
     }
+    colnames(sample_Wp_reads) <- c("qname", "flag", "rname", "pos", "mapq", "cigar", "rnext", "pnext", "tlen", "seq", "qual")
     sample_reference <- readDNAStringSet(sam_references[i])
     sample_reference <- paste(sample_reference, collapse = "")
     sample_reference <- unlist(strsplit(as.character(sample_reference), split = "")) # split the genome reference into a vector characters
     reference_W0_coordinates <- subset(reference_IR1_coordinates, reference_IR1_coordinates$exon == "W0")
-    for(j in 1:nrow(sample_Wp_reads)){
-        if(sample_Wp_reads$flag[j] == "0"){ # check if the read is mapped to the plus strand
-            reverse_left_clip <- ""
-            left_clip_length <- 0
-            left_S_index <- 0
-            cigar <- unlist(strsplit(sample_Wp_reads$cigar[j], "")) # split the cigar string into a vector of characters
-            for(k in 1:length(cigar)){
-                if(cigar[k] == "S"){ # check for presence of left soft clip (S)
-                    left_S_index <- k
-                    for(m in (k - 1):1){
-                        reverse_left_clip <- paste(reverse_left_clip, cigar[m], sep = "") # extract left clip numbers
+    if(nrow(sample_Wp_reads) > 0){
+        for(j in 1:nrow(sample_Wp_reads)){
+            if(sample_Wp_reads$flag[j] == 0){ # check if the read is mapped to the plus strand
+                reverse_left_clip <- ""
+                left_clip_length <- 0
+                left_S_index <- 0
+                cigar <- unlist(strsplit(sample_Wp_reads$cigar[j], "")) # split the cigar string into a vector of characters
+                for(k in 1:length(cigar)){
+                    if(cigar[k] == "S"){ # check for presence of left soft clip (S)
+                        left_S_index <- k
+                        for(m in (k - 1):1){
+                            reverse_left_clip <- paste(reverse_left_clip, cigar[m], sep = "") # extract left clip numbers
+                        }
+                        left_clip_length <- as.numeric(stri_reverse(reverse_left_clip)) # calculate left clip length
+                        break
                     }
-                    left_clip_length <- as.numeric(stri_reverse(reverse_left_clip)) # calculate left clip length
-                    break
+                    else if(cigar[k] == "M" | cigar[k] == "I" | cigar[k] == "D" | cigar[k] == "N" | cigar[k] == "H"){ # check for absence of a left soft clip
+                        break
+                    }
                 }
-                else if(cigar[k] == "M" | cigar[k] == "I" | cigar[k] == "D" | cigar[k] == "N" | cigar[k] == "H"){ # check for absence of a left soft clip
-                    break
+                if(left_clip_length >= mininum_W0_clip_length){ # check if the left clip is long enough to be a W0 exon as defined by the user
+                    W0_corrected_qnames <- c(W0_corrected_qnames, sample_Wp_reads$qname[j])
+                    nearest_W0_index <- which.min(abs(as.numeric(reference_W0_coordinates$start) - as.numeric(sample_Wp_reads$pos[j]))) # calculate the index of the reference W0 exon that is closest to the start position of the read
+                    nearest_W0_sequence <- sample_reference[as.numeric(reference_W0_coordinates$start[nearest_W0_index]):as.numeric(reference_W0_coordinates$end[nearest_W0_index])]
+                    skip_length <- as.numeric(sample_Wp_reads$pos[j]) - as.numeric(reference_W0_coordinates$end[nearest_W0_index]) - 1 # calculate the number of bases to skip between the end of the W0 exon and the start of the read
+                    new_cigar <- paste(as.character(length(nearest_W0_sequence)), "M", skip_length, "N", substring(sample_Wp_reads$cigar[j], (left_S_index + 1), length(cigar)), sep = "") # create a new cigar string that includes the W0 exon
+                    read_sequence <- unlist(strsplit(sample_Wp_reads$seq[j], ""))
+                    retained_read_sequence <- substring(sample_Wp_reads$seq[j], (left_clip_length + 1), length(read_sequence))
+                    nearest_W0_sequence <- paste(nearest_W0_sequence, collapse = "")
+                    new_read_sequence <- paste(nearest_W0_sequence, retained_read_sequence, sep = "") # create a new read sequence that includes the W0 exon
+                    sample_reads$cigar[sample_reads$qname == sample_Wp_reads$qname[j]] <- new_cigar
+                    sample_reads$seq[sample_reads$qname == sample_Wp_reads$qname[j]] <- new_read_sequence
+                    sample_reads$pos[sample_reads$qname == sample_Wp_reads$qname[j]] <- as.numeric(reference_W0_coordinates$start[nearest_W0_index])
                 }
-            }
-            if(left_clip_length >= mininum_W0_clip_length){ # check if the left clip is long enough to be a W0 exon as defined by the user
-                W0_corrected_qnames <- c(W0_corrected_qnames, sample_Wp_reads$qname[j])
-                nearest_W0_index <- which.min(abs(as.numeric(reference_W0_coordinates$start) - as.numeric(sample_Wp_reads$pos[j]))) # calculate the index of the reference W0 exon that is closest to the start position of the read
-                nearest_W0_sequence <- sample_reference[as.numeric(reference_W0_coordinates$start[nearest_W0_index]):as.numeric(reference_W0_coordinates$end[nearest_W0_index])]
-                skip_length <- as.numeric(sample_Wp_reads$pos[j]) - as.numeric(reference_W0_coordinates$end[nearest_W0_index]) - 1 # calculate the number of bases to skip between the end of the W0 exon and the start of the read
-                new_cigar <- paste(as.character(length(nearest_W0_sequence)), "M", skip_length, "N", substring(sample_Wp_reads$cigar[j], (left_S_index + 1), length(cigar)), sep = "") # create a new cigar string that includes the W0 exon
-                read_sequence <- unlist(strsplit(sample_Wp_reads$seq[j], ""))
-                retained_read_sequence <- substring(sample_Wp_reads$seq[j], (left_clip_length + 1), length(read_sequence))
-                nearest_W0_sequence <- paste(nearest_W0_sequence, collapse = "")
-                new_read_sequence <- paste(nearest_W0_sequence, retained_read_sequence, sep = "") # create a new read sequence that includes the W0 exon
-                sample_reads$cigar[sample_reads$qname == sample_Wp_reads$qname[j]] <- new_cigar
-                sample_reads$seq[sample_reads$qname == sample_Wp_reads$qname[j]] <- new_read_sequence
-                sample_reads$pos[sample_reads$qname == sample_Wp_reads$qname[j]] <- as.numeric(reference_W0_coordinates$start[nearest_W0_index])
             }
         }
     }
@@ -82,7 +85,7 @@ for(i in 1:length(sam_files)){
     write.table(combined_reads[[i]], paste0(sam_names[i], "_full_length_transcripts_final.sam"), sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE) # output the headerless sam file corrected for W0 exon clipping
 }
 
-### Calculate the size of each exon in each IR1-containing read and output the results ###
+### Calculate the size of each exon in each read with an IR1-component and output the results ###
 combined_IR1_read_exon_lengths <- vector(mode = "list", length = length(sam_files))
 for(i in 1:length(sam_files)){
     sample_reads <- combined_reads[[i]]
@@ -210,7 +213,7 @@ for(i in 1:length(sam_files)){
     }
     colnames(sample_IR1_read_exon_lengths) <- c("qname", reference_IR1_coordinates$exon)
     combined_IR1_read_exon_lengths[[i]] <- sample_IR1_read_exon_lengths
-    write.table(combined_IR1_read_exon_lengths[[i]], paste0(sam_names[i], "_IR1_exon_compositions.txt"), sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
+    write.table(combined_IR1_read_exon_lengths[[i]], paste0(sam_names[i], "_exon_contents.txt"), sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
 }
 
 ### Determine the 3' element of the IR1-containing reads ###
@@ -382,5 +385,5 @@ for(i in 1:length(combined_IR1_read_exon_lengths)){
     }
     combined_IR1_repeat_counts[[i]] <- cbind(combined_aligner_IR1_repeat_counts[[i]], sample_nucleotide_IR1_repeat_counts)
     colnames(combined_IR1_repeat_counts[[i]]) <- c(colnames(combined_aligner_IR1_repeat_counts[[i]]), "distance_count")
-    write.table(combined_IR1_repeat_counts[[i]], file = paste0(sam_names[i], "_IR1_copy_number_variation.txt"), sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
+    write.table(combined_IR1_repeat_counts[[i]], file = paste0(sam_names[i], "_IR1_copy_number_diversity.txt"), sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
 }
