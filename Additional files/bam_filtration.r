@@ -1,9 +1,8 @@
 #!/usr/bin/Rscript --vanilla
 
-##########################################################################
+######################
 # Aaron Logsdon, 2023
-# Wrriten in R (version 4.2.2) with the package Rsamtools (version 2.14.0)
-##########################################################################
+######################
 
 # Script that generates n number of filtered bam files from n number of input bam files
 # Example use is to filter bam files for reads aligning to EBV, retaining only reads that align to EBV (Rscript ./bam_filtration.r ./input.bam name_one 3 ./EBV_reference_name.txt TRUE)
