@@ -1,4 +1,4 @@
-# IR1 transcript variation pipeline
+# EBV transcript variation pipeline
 A pipeline for analysing the diversity of IR1 copy number and alternative splicing of Cp- and Wp-initiated transcripts in Epstein-Barr virus (EBV) long-read RNA-seq datasets. The pipeline is implemented in two R scripts which can be downloaded and ran on the command line:
 1. [full_length_transcript_identification.r](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/src/full_length_transcript_identification.r) isolates and extracts full-length transcripts from EBV long-read RNA-seq SAM files.
 2. [transcript_variation_calculation.r](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/src/transcript_variation_calculation.r) calculates the diversity of IR1 copy number and exon content of each extracted full-length Cp- and Wp-initiated transcript.
