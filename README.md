@@ -33,7 +33,7 @@ To separate each of one or more EBV long-read RNA-seq headerless SAM files into 
 ### Input and output
 Input: 
 1. One or more SAM files (list of directories).
-2. Matching list of SAM file names (list of strings). 
+2. Matching list of SAM file name(s) (list of strings). 
 3. Window size for capture stage one (integer). We use 2.
 4. Minimum cluster size for capture stage one (integer). We use 5.
 6. Window size for capture stage two (integer). We use 20.
