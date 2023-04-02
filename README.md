@@ -67,7 +67,7 @@ To calculate IR1 copy number and alternative splicing diversity of Cp- and Wp-in
 5. Outputs a text file containing the aligned exon content of each read and another text file containing IR1 copy number diversity as calculated by the alignment an distance count, for each input headerless SAM file.
 
 ### Limitations 
-1. The script requires the pipeline's EBV exon coordinates BED file to work (see [here](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/examples/IR1_transcript_variation_calculation/input.bed)), which cannot be changed a part from to add or remove IR1 copies (each copy must have an entry for W0, W1, W1_prime, W2, W2_prime). The default is six copies.
+1. The script requires the pipeline's EBV exon coordinates BED file to work (see [here](https://github.com/loggy01/EBV-transcript-variation-pipeline/blob/main/examples/transcript_variation_calculation/input.bed)), which cannot be changed a part from to add or remove IR1 copies (each copy must have an entry for W0, W1, W1_prime, W2, W2_prime). The default is six copies.
 2. The script is optimised for Oxford Nanopore Technologies data and may perform sub-optimally with other long-read RNA-seq technologies.
 
 ### Input and output
