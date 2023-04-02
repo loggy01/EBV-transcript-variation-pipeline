@@ -1,7 +1,7 @@
 # IR1 transcript variation pipeline
-A pipeline for analysing IR1 copy number and splice variation of IR1-centred transcripts in Epstein-Barr virus long-read RNA-seq datasets. The pipeline is implemented in two R scripts which can be downloaded and ran on the command line:
+A pipeline for analysing the diversity of IR1 copy number and alternative splicing of Cp- and Wp-initiated transcripts in Epstein-Barr virus long-read RNA-seq datasets. The pipeline is implemented in two R scripts which can be downloaded and ran on the command line:
 1. [full_length_transcript_identification.r](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/src/full_length_transcript_identification.r) isolates full-length transcripts from long-read SAM files (must only contain EBV reads. See [here](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/Additional%20files/command_lines.docx)).
-2. [IR1_transcript_variation_calculation.r](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/src/IR1_transcript_variation_calculation.r) calculates the IR1 copy number and exon composition of full-length IR1-centred transcripts.
+2. [transcript_variation_calculation.r](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/src/transcript_variation_calculation.r) calculates the IR1 copy number and exon composition of full-length IR1-centred transcripts.
 
 For exemplar data preprocessing steps see [here](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/Additional%20files/command_lines.docx) and [here](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/Additional%20files/bam_filtration.r).
 
