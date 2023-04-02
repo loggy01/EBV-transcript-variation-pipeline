@@ -81,7 +81,7 @@ Input:
 7. Window size for internal exon position variability from the associated EBV exon cooridnates BED file (integer). We use 2.
 
 Output (per input headerless SAM file):
-1. ./sample_name_full_length_transcripts_final.sam (remember to add back the header yourself)
+1. ./sample_name_full_length_transcripts_final.sam
 2. ./sam_name_IR1_exon_compositions.txt
 3. ./sam_name_IR1_copy_number_variation.txt
 
