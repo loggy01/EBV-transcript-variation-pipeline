@@ -3,7 +3,7 @@ A pipeline for analysing the diversity of IR1 copy number and alternative splici
 1. [full_length_transcript_identification.r](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/src/full_length_transcript_identification.r) isolates and extracts full-length transcripts from long-read SAM files (must only contain EBV reads. See [here](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/Additional%20files/command_lines.docx)).
 2. [transcript_variation_calculation.r](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/src/transcript_variation_calculation.r) calculates the diversity of IR1 copy number and exon content of each full-length Cp- and Wp-initiated transcripts.
 
-For exemplar data preprocessing steps see [here](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/Additional%20files/command_lines.docx) and [here](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/Additional%20files/bam_filtration.r).
+For necessary data preprocessing steps see [here](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/Additional%20files/command_lines.docx) and [here](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/Additional%20files/bam_filtration.r).
 
 
 ## full_length_transcript_identification.r
