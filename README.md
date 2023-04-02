@@ -9,7 +9,7 @@ For necessary data preprocessing steps see [here](https://github.com/loggy01/IR1
 ## full_length_transcript_identification.r
 
 ### Purpose
-To separate each of one or more EBV long-read RNA-seq headerless SAM files into four output SAM files with the following content:
+To separate each of one or more EBV long-read RNA-seq headerless SAM files into four output SAM files with the following content respectively:
 1. Full length transcripts
 2. 3' intact transcripts
 3. 5' intact transcripts
@@ -19,7 +19,7 @@ To separate each of one or more EBV long-read RNA-seq headerless SAM files into 
 [R](http://lib.stat.cmu.edu/R/CRAN/) must be installed locally along with the packages [data.table](https://cran.r-project.org/web/packages/data.table/index.html), [stringi](https://cran.r-project.org/web/packages/stringi/index.html), and [tidyverse](https://cran.r-project.org/web/packages/tidyverse/index.html).
 
 ### Functions
-1. Capture stage one: defines each 5' and 3' end as reproducible if they occurr in a (user-defined) large enough cluster in a (user-defined) small enough window size.
+1. Capture stage one: defines each 5' and 3' end as reproducible if they occur in a (user-defined) large enough cluster in a (user-defined) small enough window size.
 2. Capture stage two: redefines read ends labelled as noise in the previous stage as reproducible if they occur within a (user-defined) small enough window size of a reproducible cluster.  
 3. Capture stage three: adds back soft-clipped bases to read ends still defined as noise and redfines them as reproducible if they now occur within a (user-defined) small enough window size of a reproducible cluster. 
 4. Assigns reads to one of four output SAM files based on whether a read has a reproducile 5' and/or 3' end.
