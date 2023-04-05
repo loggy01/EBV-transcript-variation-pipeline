@@ -63,7 +63,7 @@ To calculate IR1 copy number and alternative splicing diversity of Cp- and Wp-in
 1. Adds back the W0 exon to transcripts in which it has been erroneously clipped off, using a (user-defined) mininum soft-clip size for consideration, and outputs the updated SAM files.
 2. Calculates the aligned exon content in each Cp- and Wp-initiated transcript using two (user-defined) window sizes to account for position variability of 5' and 3' exons and internal exons respectively. 
 3. Calculates the diversity of IR1 copy number in Cp- and Wp-initiated transcripts based on the number of aligned W1, W1', W2, and W2' exons in each read. This is termed the *alignment count* and only includes aligned IR1 copies.
-4. Calculates the diversity of IR1 copy number in Cp- and Wp-initiated transcripts based on the size of the aligned IR1 component of each read. This is termed the *distance count* and includes aligned and misaligned IR1 copies.
+4. Calculates the diversity of IR1 copy number in Cp- and Wp-initiated transcripts based on the size of the aligned IR1 component of each read. This is termed the *distance count* and includes aligned and misaligned IR1 copies, representing the ground truth value for alignment validation and correction.
 5. Outputs a text file containing the aligned exon content of each read and another text file containing IR1 copy number diversity as calculated by the alignment and distance counts, for each input headerless SAM file.
 
 ### Limitations 
