@@ -22,7 +22,7 @@ To separate each of one or more EBV long-read RNA-seq headerless SAM files into 
 1. Capture stage one: defines each 5' and 3' end as reproducible if they occur in a (user-defined) large enough cluster in a (user-defined) small enough window size.
 2. Capture stage two: redefines read ends labelled as noise in the previous stage as reproducible if they occur within a (user-defined) small enough window size of a reproducible cluster.  
 3. Capture stage three: adds back soft-clipped bases to read ends still defined as noise and redfines them as reproducible if they now occur within a (user-defined) small enough window size of a reproducible cluster. 
-4. Assigns reads to one of four output SAM files based on whether a read has a reproducile 5' and/or 3' end.
+4. Assigns reads to one of four output SAM files based on whether a read has a reproducile 5' and/or 3' end (or none).
 
 ### Limitations
 1. Secondary and supplementary reads are not supported and must be removed from SAM files prior. See [here](https://github.com/loggy01/IR1-transcript-variation-pipeline/blob/main/Additional%20files/command_lines.docx).
